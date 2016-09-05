@@ -29,10 +29,11 @@ class SevenSegmentArrayDisplay {
     const int DISPLAY_COUNT = 3;
     const int SEVEN_SEG_CATHODES[3] = {11, 12, 13};
 
-    int lastNumber = 0;
-    int lastDisplayIndex = 0;      // current enabled display
-    unsigned long updateInterval = 5;       // interval between updates
-    unsigned long lastUpdate; // last update of position
+    const unsigned long updateInterval = 1;
+    unsigned long lastUpdate;         // last time of update
+    
+    int lastDigit = 0;
+    int lastDisplayIndex = 0;         // current enabled display
 
   public:
     SevenSegmentArrayDisplay() {}
@@ -64,20 +65,20 @@ class SevenSegmentArrayDisplay {
 
         //calc number to print
         bool doPrint = true;
-        int number;
+        int digit;
         long counter = min(999, currentMillis / 100);
         if (displayIndex == 0) {
-          number = counter % 10;
+          digit = counter % 10;
         }
         else if (displayIndex == 1) {
-          number = (counter / 10) % 10;
-          if (lastNumber == 0 && number == 0) {
+          digit = (counter / 10) % 10;
+          if (lastDigit == 0 && digit == 0) {
             doPrint = false;
           }
         }
         else if (displayIndex == 2) {
-          number =  counter / 100;
-          if (number == 0) {
+          digit =  counter / 100;
+          if (digit == 0) {
             doPrint = false;
           }
         }
@@ -85,13 +86,13 @@ class SevenSegmentArrayDisplay {
         //disable previous cathode
         digitalWrite(SEVEN_SEG_CATHODES[lastDisplayIndex], HIGH);
 
-        lastNumber = number;
+        lastDigit = digit;
         lastDisplayIndex = displayIndex;
 
         if (doPrint) {
           //set states of each segment pin
           for (int i = 0; i < 7; i++) {
-            digitalWrite(SEVEN_SEG_PINS[i], SEVEN_SEG_PIN_STATES[number][i]);
+            digitalWrite(SEVEN_SEG_PINS[i], SEVEN_SEG_PIN_STATES[digit][i]);
           }
 
           //enable current cathode
