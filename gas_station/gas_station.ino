@@ -61,20 +61,18 @@ void loop() {
 /// number - number (0-9) to show on display
 /// displayIndex - index (1-DISPLAY_COUNT) of 7-segment display to use
 void outputNumber(int displayIndex, int number) {
-  //enable correct cathode only
-  for (int i = 1; i <= DISPLAY_COUNT; i++) {
-    if (i == displayIndex) {
-      digitalWrite(SEVEN_SEG_CATHODES[i-1], LOW);
-    }
-    else {
-      digitalWrite(SEVEN_SEG_CATHODES[i-1], HIGH);
-    }
+  //disable all cathodes
+  for (int i = 0; i < DISPLAY_COUNT; i++) {
+    digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
   }
 
   //set states of each segment pin
   for (int i = 0; i < 7; i++) {
     digitalWrite(SEVEN_SEG_PINS[i], SEVEN_SEG_PIN_STATES[number][i]);
   }
+
+  //enable correct cathode
+  digitalWrite(SEVEN_SEG_CATHODES[displayIndex-1], LOW);
 }
 
 
