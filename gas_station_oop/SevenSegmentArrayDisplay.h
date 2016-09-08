@@ -2,7 +2,7 @@ class SevenSegmentArrayDisplay {
 
   public:
     void setup();
-    void update();
+    void update(unsigned long startTime);
   private:
     //pins for segments on the 7 segment displays
 
@@ -14,7 +14,7 @@ class SevenSegmentArrayDisplay {
 
 
     // pin numbers correspoing to segments A,B,C,D,E,F,G
-    const int SEVEN_SEG_PINS[7] = {1, 2, 3, 4, 5, 6, 7};
+    const int SEVEN_SEG_PINS[7] = {3, 4, 5, 6, 7, 8, 9};
 
     const int SEVEN_SEG_PIN_STATES[10][7] = {
       //A    B     C     D     E     F     G

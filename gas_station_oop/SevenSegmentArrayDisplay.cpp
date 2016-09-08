@@ -14,7 +14,7 @@ void SevenSegmentArrayDisplay::setup()
   lastUpdate = millis();
 }
 
-void SevenSegmentArrayDisplay::update()
+void SevenSegmentArrayDisplay::update(unsigned long startTime)
 {
   unsigned long currentMillis = millis();
   if ((currentMillis - lastUpdate) > updateInterval) // time to update
@@ -29,7 +29,7 @@ void SevenSegmentArrayDisplay::update()
     //calc number to print
     bool doPrint = true;
     int digit;
-    long counter = min(999, currentMillis / 100);
+    long counter = min(999, (currentMillis-startTime) / 100);
     if (displayIndex == 0) {
       digit = counter % 10;
     }

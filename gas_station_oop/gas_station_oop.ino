@@ -1,7 +1,8 @@
 #include "SevenSegmentArrayDisplay.h"
+#include "ActivatorButton.h"
 
 class Speaker {
-    const int SPEAKER_OUT = 9;
+    const int SPEAKER_OUT = 10;
 
   public:
     Speaker() {}
@@ -22,15 +23,24 @@ class Speaker {
 
 };
 
+bool isRunning = false;
 SevenSegmentArrayDisplay disp;
 Speaker speaker;
+ActivatorButton button(2);
 
 void setup() {
   disp.setup();
   speaker.setup();
+  button.setup();
 }
 
 void loop() {
-  disp.update();
-  //speaker.update();
+  if (button.isActivated()) {
+    if (!isRunning) {
+      //first update after button activated
+      //speaker.start();
+      isRunning = true;
+    }
+    disp.update(button.getActivationTime());
+  }
 }
