@@ -24,9 +24,11 @@ const int SEVEN_SEG_PIN_STATES[][7] = {
   {HIGH, HIGH, HIGH, HIGH, LOW,  HIGH, HIGH}, // 9
 };
 
-const int DISPLAY_DELAY = 5;
+const int DISPLAY_DELAY = 500;
 const int DISPLAY_COUNT = 3;
-const int SEVEN_SEG_CATHODES[] = {9, 10, 11};
+const int SEVEN_SEG_CATHODES[] = {11, 12, 13};
+
+const int SPEAKER_OUT = 9;
 
 
 void setup() {
@@ -38,43 +40,55 @@ void setup() {
     pinMode(SEVEN_SEG_CATHODES[i], OUTPUT);
     digitalWrite(SEVEN_SEG_CATHODES[i], LOW);
   }
+
+  pinMode(SPEAKER_OUT, OUTPUT);
 }
 
 void loop() {
-  long counter = millis();
-  counter = counter / 100;
   
-  outputNumber(1, counter % 10);
-  delay(DISPLAY_DELAY);
-  int tens = int((counter % 100) / 10);
-  int hundreds = int((counter % 1000) / 100);
+  long counter = min(999, millis()/100);
+  int hundreds = counter / 100;
+  int tens = (counter / 10) % 10;
+  int ones = counter % 10;
+  
+    
+  outputNumber(1, ones);
+  //playTone(DISPLAY_DELAY);
   if(hundreds > 0 || tens > 0) {
     outputNumber(2, tens);  
   }
-  delay(DISPLAY_DELAY);
+  //playTone(DISPLAY_DELAY);
   if(hundreds > 0) {
     outputNumber(3, hundreds);  
   }
-  delay(DISPLAY_DELAY);
+  //playTone(DISPLAY_DELAY);
+}
+
+void playTone(int duration) {
+  int endtime = millis() + duration;
+  while(millis() < endtime) {
+    digitalWrite(SPEAKER_OUT,HIGH);
+    delay(10);
+    digitalWrite(SPEAKER_OUT,LOW);
+    delay(10);
+  }
 }
 
 /// number - number (0-9) to show on display
 /// displayIndex - index (1-DISPLAY_COUNT) of 7-segment display to use
 void outputNumber(int displayIndex, int number) {
-  //enable correct cathode only
-  for (int i = 1; i <= DISPLAY_COUNT; i++) {
-    if (i == displayIndex) {
-      digitalWrite(SEVEN_SEG_CATHODES[i-1], LOW);
-    }
-    else {
-      digitalWrite(SEVEN_SEG_CATHODES[i-1], HIGH);
-    }
+  //disable all cathodes
+  for (int i = 0; i < DISPLAY_COUNT; i++) {
+    digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
   }
 
   //set states of each segment pin
   for (int i = 0; i < 7; i++) {
     digitalWrite(SEVEN_SEG_PINS[i], SEVEN_SEG_PIN_STATES[number][i]);
   }
+
+  //enable correct cathode
+  digitalWrite(SEVEN_SEG_CATHODES[displayIndex-1], LOW);
 }
 
 
