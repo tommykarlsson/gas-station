@@ -10,4 +10,4 @@ Upload to standalone ATMega328p using Arduino IDE:
 
 ## Hardware
 
-![Breadbord wiring](https://github.com/tommykarlsson/gas-station/doc/gas-station_bb.png)
+![Breadbord wiring](doc/gas-station_bb.png)
