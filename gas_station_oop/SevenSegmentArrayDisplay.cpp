@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "SevenSegmentArrayDisplay.h"
 
-void SevenSegmentArrayDisplay::setup()
+void SevenSegmentArrayDisplay::setup(int maxVal)
 {
   for (int i = 0; i < 7; i++) {
     pinMode(SEVEN_SEG_PINS[i], OUTPUT);
@@ -12,6 +12,7 @@ void SevenSegmentArrayDisplay::setup()
     digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
   }
   lastUpdate = millis();
+  maxValue = maxVal;
 }
 
 void SevenSegmentArrayDisplay::update(unsigned long startTime)
@@ -29,7 +30,10 @@ void SevenSegmentArrayDisplay::update(unsigned long startTime)
     //calc number to print
     bool doPrint = true;
     int digit;
-    long counter = min(999, (currentMillis-startTime) / 100);
+    long counter = min(maxValue, (currentMillis-startTime) / 100);
+    if(startTime > currentMillis) {
+      counter = 0;
+    }
     if (displayIndex == 0) {
       digit = counter % 10;
     }

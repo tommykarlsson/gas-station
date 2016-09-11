@@ -3,6 +3,8 @@
 
 class Speaker {
   const int SPEAKER_OUT = 3;
+  const int FREQUENCY_HZ = 300;
+  bool isRunning = false;
 
   public:
     Speaker() {}
@@ -14,33 +16,39 @@ class Speaker {
 
     void start()
     {
-      tone(SPEAKER_OUT, 150);
+      if(!isRunning) {
+        tone(SPEAKER_OUT, FREQUENCY_HZ);
+        isRunning = true;
+      }
     }
 
     void stop() {
-      noTone(SPEAKER_OUT);
+      if(isRunning) {
+        noTone(SPEAKER_OUT);
+        isRunning = false;
+      }
     }
 
 };
 
-bool isRunning = false;
 SevenSegmentArrayDisplay disp;
 Speaker speaker;
 ActivatorButton button(2);
 
 void setup() {
-  disp.setup();
+  randomSeed(analogRead(0));
+  disp.setup(random(50,251));
   speaker.setup();
   button.setup();
 }
 
 void loop() {
   if (button.isActivated()) {
-    if (!isRunning) {
-      //first update after button activated
+    long pumpStartTime = button.getActivationTime() + 1000;
+    if (millis() > pumpStartTime) {
+      //first update 1 second after button activated
       speaker.start();
-      isRunning = true;
     }
-    disp.update(button.getActivationTime());
+    disp.update(pumpStartTime);
   }
 }

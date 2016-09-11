@@ -1,7 +1,7 @@
 class SevenSegmentArrayDisplay {
 
   public:
-    void setup();
+    void setup(int maxVal);
     void update(unsigned long startTime);
   private:
     //pins for segments on the 7 segment displays
@@ -39,4 +39,6 @@ class SevenSegmentArrayDisplay {
 
     int lastDigit = 0;
     int lastDisplayIndex = 0;         // current enabled display
+
+    int maxValue = 0;
 };
