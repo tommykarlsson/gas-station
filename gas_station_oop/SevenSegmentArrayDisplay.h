@@ -14,7 +14,7 @@ class SevenSegmentArrayDisplay {
 
 
     // pin numbers correspoing to segments A,B,C,D,E,F,G
-    const int SEVEN_SEG_PINS[7] = {1, 2, 3, 4, 5, 6, 7};
+    const int SEVEN_SEG_PINS[7] = {6, 5, 11, 10, 9, 7, 8};
 
     const int SEVEN_SEG_PIN_STATES[10][7] = {
       //A    B     C     D     E     F     G
@@ -31,7 +31,7 @@ class SevenSegmentArrayDisplay {
     };
 
     const int DISPLAY_COUNT = 3;
-    const int SEVEN_SEG_CATHODES[3] = {11, 12, 13};
+    const int SEVEN_SEG_CATHODES[3] = {4, 12, 13};
 
     const unsigned long updateInterval = 1;
     unsigned long lastUpdate;         // last time of update

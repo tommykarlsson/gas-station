@@ -1,7 +1,7 @@
 #include "SevenSegmentArrayDisplay.h"
 
 class Speaker {
-    const int SPEAKER_OUT = 9;
+    const int SPEAKER_OUT = 3;
 
   public:
     Speaker() {}
