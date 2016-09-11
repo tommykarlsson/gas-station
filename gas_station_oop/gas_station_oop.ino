@@ -2,7 +2,7 @@
 #include "ActivatorButton.h"
 
 class Speaker {
-  const int SPEAKER_OUT = 9;
+  const int SPEAKER_OUT = 3;
 
   public:
     Speaker() {}
@@ -38,7 +38,7 @@ void loop() {
   if (button.isActivated()) {
     if (!isRunning) {
       //first update after button activated
-      //speaker.start();
+      speaker.start();
       isRunning = true;
     }
     disp.update(button.getActivationTime());
