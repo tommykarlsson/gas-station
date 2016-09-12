@@ -15,7 +15,7 @@ void SevenSegmentArrayDisplay::setup(int maxVal)
   maxValue = maxVal;
 }
 
-void SevenSegmentArrayDisplay::update(unsigned long startTime)
+bool SevenSegmentArrayDisplay::update(unsigned long startTime)
 {
   unsigned long currentMillis = millis();
   if ((currentMillis - lastUpdate) > updateInterval) // time to update
@@ -30,7 +30,12 @@ void SevenSegmentArrayDisplay::update(unsigned long startTime)
     //calc number to print
     bool doPrint = true;
     int digit;
-    long counter = min(maxValue, (currentMillis-startTime) / 100);
+    long counter = (currentMillis-startTime) / 100;
+    if(counter >= maxValue) {
+      counter = maxValue;
+      reachedMax = true;
+    }
+    
     if(startTime > currentMillis) {
       counter = 0;
     }
@@ -38,22 +43,23 @@ void SevenSegmentArrayDisplay::update(unsigned long startTime)
       digit = counter % 10;
     }
     else if (displayIndex == 1) {
-      digit = (counter / 10) % 10;
-      if (lastDigit == 0 && digit == 0) {
+      if (counter < 10) {
         doPrint = false;
+      } else {
+        digit = (counter / 10) % 10;
       }
     }
     else if (displayIndex == 2) {
-      digit =  counter / 100;
-      if (digit == 0) {
+      if(counter < 100) {
         doPrint = false;
+      } else {
+        digit =  counter / 100;
       }
     }
 
     //disable previous cathode
     digitalWrite(SEVEN_SEG_CATHODES[lastDisplayIndex], HIGH);
 
-    lastDigit = digit;
     lastDisplayIndex = displayIndex;
 
     if (doPrint) {
@@ -66,5 +72,6 @@ void SevenSegmentArrayDisplay::update(unsigned long startTime)
       digitalWrite(SEVEN_SEG_CATHODES[displayIndex], LOW);
     }
   }
+  return reachedMax;
 }
 

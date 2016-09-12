@@ -2,7 +2,7 @@ class SevenSegmentArrayDisplay {
 
   public:
     void setup(int maxVal);
-    void update(unsigned long startTime);
+    bool update(unsigned long startTime);
   private:
     //pins for segments on the 7 segment displays
 
@@ -37,8 +37,8 @@ class SevenSegmentArrayDisplay {
     const unsigned long updateInterval = 1;
     unsigned long lastUpdate;         // last time of update
 
-    int lastDigit = 0;
     int lastDisplayIndex = 0;         // current enabled display
 
     int maxValue = 0;
+    bool reachedMax = false;
 };
