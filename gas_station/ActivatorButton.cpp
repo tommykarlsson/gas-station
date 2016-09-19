@@ -3,7 +3,7 @@
 
 int buttonPin;
 volatile bool activated = false;
-volatile unsigned long activationTime = 0;
+volatile unsigned long activationTime = 0UL;
 
 //pin must be 2 or 3 on arduino uno
 ActivatorButton::ActivatorButton(int pin) {

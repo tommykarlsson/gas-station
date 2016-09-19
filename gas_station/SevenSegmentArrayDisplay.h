@@ -1,8 +1,9 @@
 class SevenSegmentArrayDisplay {
 
   public:
-    void setup(int maxVal);
+    void setup(long maxVal);
     bool update(unsigned long startTime);
+    void shutdown();
   private:
     //pins for segments on the 7 segment displays
 
@@ -34,11 +35,12 @@ class SevenSegmentArrayDisplay {
     const int DISPLAY_COUNT = 3;
     const int SEVEN_SEG_CATHODES[3] = {4, 12, 13};
 
-    const unsigned long updateInterval = 1;
+    const unsigned long UPDATE_INTERVAL = 1UL;
+    const unsigned long MILLIS_PER_INCREMENT = 100UL;
+
     unsigned long lastUpdate;         // last time of update
 
     int lastDisplayIndex = 0;         // current enabled display
 
-    int maxValue = 0;
-    bool reachedMax = false;
+    unsigned long maxValue = 0UL;
 };

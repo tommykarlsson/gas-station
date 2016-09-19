@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "SevenSegmentArrayDisplay.h"
 
-void SevenSegmentArrayDisplay::setup(int maxVal)
+void SevenSegmentArrayDisplay::setup(long maxVal)
 {
   for (int i = 0; i < 7; i++) {
     pinMode(SEVEN_SEG_PINS[i], OUTPUT);
@@ -12,13 +12,21 @@ void SevenSegmentArrayDisplay::setup(int maxVal)
     digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
   }
   lastUpdate = millis();
-  maxValue = maxVal;
+  maxValue = (unsigned long)maxVal;
+}
+
+void SevenSegmentArrayDisplay::shutdown() {
+   for (int i = 0; i < DISPLAY_COUNT; i++) {
+    digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
+  }
 }
 
 bool SevenSegmentArrayDisplay::update(unsigned long startTime)
 {
   unsigned long currentMillis = millis();
-  if ((currentMillis - lastUpdate) > updateInterval) // time to update
+  unsigned long endTime = startTime + (maxValue * MILLIS_PER_INCREMENT);
+
+  if ((currentMillis - lastUpdate) >= UPDATE_INTERVAL) // time to update
   {
     lastUpdate = currentMillis;
 
@@ -30,30 +38,28 @@ bool SevenSegmentArrayDisplay::update(unsigned long startTime)
     //calc number to print
     bool doPrint = true;
     int digit;
-    long counter = (currentMillis-startTime) / 100;
-    if(counter >= maxValue) {
+    unsigned long counter = 0UL;
+    if(currentMillis > endTime) {
       counter = maxValue;
-      reachedMax = true;
+    } else if(currentMillis > startTime) {
+      counter = (currentMillis-startTime) / MILLIS_PER_INCREMENT;
     }
     
-    if(startTime > currentMillis) {
-      counter = 0;
-    }
     if (displayIndex == 0) {
-      digit = counter % 10;
+      digit = (int)(counter % 10);
     }
     else if (displayIndex == 1) {
-      if (counter < 10) {
+      if (counter < 10UL) {
         doPrint = false;
       } else {
-        digit = (counter / 10) % 10;
+        digit = (int)((counter / 10) % 10);
       }
     }
     else if (displayIndex == 2) {
-      if(counter < 100) {
+      if(counter < 100UL) {
         doPrint = false;
       } else {
-        digit =  counter / 100;
+        digit =  (int)(counter / 100);
       }
     }
 
@@ -72,6 +78,6 @@ bool SevenSegmentArrayDisplay::update(unsigned long startTime)
       digitalWrite(SEVEN_SEG_CATHODES[displayIndex], LOW);
     }
   }
-  return reachedMax;
+  return currentMillis >= startTime && currentMillis <= endTime;
 }
 

@@ -35,7 +35,6 @@ class Speaker {
 SevenSegmentArrayDisplay disp;
 Speaker speaker;
 ActivatorButton button(2);
-bool donePumping = false;
 
 void setup() {
   randomSeed(analogRead(0));
@@ -46,23 +45,23 @@ void setup() {
 
 void loop() {
   if (button.isActivated()) {
-    long pumpStartTime = button.getActivationTime() + 1000;
-    if (!donePumping && millis() > pumpStartTime) {
-      //first update 1 second after button activated
+    unsigned long pumpStartTime = button.getActivationTime() + 1000UL;
+	  bool isPumping = disp.update(pumpStartTime);
+    if (isPumping) {
       speaker.start();
-    }
-    donePumping = disp.update(pumpStartTime);
-    if(donePumping) {
+    } else {
       speaker.stop();
     }
-    if(millis() > pumpStartTime + 300000) { // shutdown 5 minutes after pump starts
-      shutdown();
+    if(millis() > pumpStartTime + 60000UL) { // shutdown 1 minute after pump starts
+      //shutdown();
     }
   }
 }
 
 //emulate shutdown by going into an eternal extreme power saving mode
 void shutdown() {
+  disp.shutdown();
+  speaker.stop();
   cli(); // disable global interrupts
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
