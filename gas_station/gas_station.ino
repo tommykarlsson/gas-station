@@ -1,14 +1,17 @@
 #include "SevenSegmentArrayDisplay.h"
 #include "ActivatorButton.h"
-#include <avr/sleep.h>
+//#include <avr/sleep.h>
 
 class Speaker {
-  const int SPEAKER_OUT = 3;
-  const int FREQUENCY_HZ = 300;
-  bool isRunning = false;
+  private:
+    const int SPEAKER_OUT = 3;
+    const int FREQUENCY_HZ = 300;
+    bool isRunning = false;
 
   public:
-    Speaker() {}
+    Speaker() {
+      isRunning = false;
+    }
 
     void setup()
     {
@@ -17,14 +20,14 @@ class Speaker {
 
     void start()
     {
-      if(!isRunning) {
+      if (!isRunning) {
         tone(SPEAKER_OUT, FREQUENCY_HZ);
         isRunning = true;
       }
     }
 
     void stop() {
-      if(isRunning) {
+      if (isRunning) {
         noTone(SPEAKER_OUT);
         isRunning = false;
       }
@@ -38,34 +41,35 @@ ActivatorButton button(2);
 
 void setup() {
   randomSeed(analogRead(0));
-  disp.setup(random(50,251));
+  //disp.setup(random(50, 251));
+  disp.setup(123);
   speaker.setup();
   button.setup();
 }
 
 void loop() {
   if (button.isActivated()) {
-    unsigned long pumpStartTime = button.getActivationTime() + 1000UL;
-	  bool isPumping = disp.update(pumpStartTime);
+    unsigned long pumpStartTime = button.getActivationTime() + 1000;
+    bool isPumping = disp.update(pumpStartTime);
     if (isPumping) {
       speaker.start();
     } else {
       speaker.stop();
     }
-    if(millis() > pumpStartTime + 60000UL) { // shutdown 1 minute after pump starts
-      //shutdown();
-    }
+    //if(millis() > pumpStartTime + 60000UL) { // shutdown 1 minute after pump starts
+    //shutdown();
+    //}
   }
 }
 
 //emulate shutdown by going into an eternal extreme power saving mode
-void shutdown() {
-  disp.shutdown();
-  speaker.stop();
-  cli(); // disable global interrupts
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  sleep_enable();
-  sleep_bod_disable();
-  sleep_mode();
-}
+//void shutdown() {
+//  disp.shutdown();
+//  speaker.stop();
+//  cli(); // disable global interrupts
+//  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+//  sleep_enable();
+//  sleep_bod_disable();
+//  sleep_mode();
+//}
 

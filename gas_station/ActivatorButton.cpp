@@ -1,16 +1,18 @@
 #include <Arduino.h>
 #include "ActivatorButton.h"
 
-int buttonPin;
-volatile bool activated = false;
-volatile unsigned long activationTime = 0UL;
+static int buttonPin;
+static volatile bool activated = false;
+static volatile unsigned long activationTime = 0UL;
 
 //pin must be 2 or 3 on arduino uno
 ActivatorButton::ActivatorButton(int pin) {
   buttonPin = pin;
+  activated = false;
+  activationTime = 0UL;
 }
 
-void onPinChange() {
+static void onPinChange() {
   if (millis() > 100) { //seems like we get interrupts randomly during startup, so wait a tiny bit before we act on interrupts
     if (!activated) {
       activationTime = millis();
@@ -23,6 +25,7 @@ void ActivatorButton::setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(buttonPin), onPinChange, CHANGE);
   activated = false;
+  activationTime = 0UL;
 }
 
 bool ActivatorButton::isActivated() {

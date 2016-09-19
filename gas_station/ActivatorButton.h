@@ -1,7 +1,7 @@
 class ActivatorButton {
 
   public:
-    ActivatorButton(int pin);
+    explicit ActivatorButton(int pin);
     void setup();
     bool isActivated();
     unsigned long getActivationTime();
