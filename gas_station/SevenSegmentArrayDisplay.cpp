@@ -1,7 +1,11 @@
 #include <Arduino.h>
 #include "SevenSegmentArrayDisplay.h"
 
-void SevenSegmentArrayDisplay::setup(int maxVal)
+SevenSegmentArrayDisplay::SevenSegmentArrayDisplay(PumpCoordinator *coordinator) {
+  coord = coordinator;
+}
+
+void SevenSegmentArrayDisplay::setup()
 {
   for (int i = 0; i < 7; i++) {
     pinMode(SEVEN_SEG_PINS[i], OUTPUT);
@@ -12,12 +16,11 @@ void SevenSegmentArrayDisplay::setup(int maxVal)
     digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
   }
   lastUpdate = millis();
-  maxValue = maxVal;
 }
 
-void SevenSegmentArrayDisplay::update(unsigned long startTime)
+void SevenSegmentArrayDisplay::update()
 {
-  unsigned long currentMillis = millis();
+  long currentMillis = millis();
   if ((currentMillis - lastUpdate) > updateInterval) // time to update
   {
     lastUpdate = currentMillis;
@@ -28,32 +31,31 @@ void SevenSegmentArrayDisplay::update(unsigned long startTime)
     }
 
     //calc number to print
-    bool doPrint = true;
-    int digit;
-    long counter = min(maxValue, (currentMillis-startTime) / 100);
-    if(startTime > currentMillis) {
-      counter = 0;
-    }
+    boolean doPrint = true;
+    int digit = 0;
+    int counter = coord->getPumpedVolume();
+
     if (displayIndex == 0) {
       digit = counter % 10;
     }
     else if (displayIndex == 1) {
-      digit = (counter / 10) % 10;
-      if (lastDigit == 0 && digit == 0) {
+      if (counter < 10) {
         doPrint = false;
+      } else {
+        digit = (counter / 10) % 10;
       }
     }
     else if (displayIndex == 2) {
-      digit =  counter / 100;
-      if (digit == 0) {
+      if (counter < 100) {
         doPrint = false;
+      } else {
+        digit =  counter / 100;
       }
     }
 
     //disable previous cathode
     digitalWrite(SEVEN_SEG_CATHODES[lastDisplayIndex], HIGH);
 
-    lastDigit = digit;
     lastDisplayIndex = displayIndex;
 
     if (doPrint) {
@@ -65,6 +67,15 @@ void SevenSegmentArrayDisplay::update(unsigned long startTime)
       //enable current cathode
       digitalWrite(SEVEN_SEG_CATHODES[displayIndex], LOW);
     }
+  }
+}
+
+void SevenSegmentArrayDisplay::stop()
+{
+  //disable all cathodes
+  for (int i = 0; i < DISPLAY_COUNT; i++) {
+    pinMode(SEVEN_SEG_CATHODES[i], OUTPUT);
+    digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
   }
 }
 

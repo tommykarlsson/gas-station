@@ -1,94 +1,83 @@
-//pins for segments on the 7 segment displays
+#include "SevenSegmentArrayDisplay.h"
+#include "ActivatorButton.h"
+#include <avr/sleep.h>
 
-// - A -
-// F   B
-// | G |
-// E   C
-// - D -
+class Speaker {
+    const int SPEAKER_OUT = 3;
+    const int FREQUENCY_HZ = 300;
+    boolean isRunning;
+    PumpCoordinator *coord;
 
+  public:
+    Speaker(PumpCoordinator *coordinator) {
+      isRunning = false;
+      coord = coordinator;
+    }
 
-// pin numbers correspoing to segments A,B,C,D,E,F,G
-const int SEVEN_SEG_PINS[] = {1, 2, 3, 4, 5, 6, 7};
+    void setup()
+    {
+      pinMode(SPEAKER_OUT, OUTPUT);
+    }
 
-const int SEVEN_SEG_PIN_STATES[][7] = {
-  //A    B     C     D     E     F     G
-  {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW }, // 0
-  {LOW,  HIGH, HIGH, LOW,  LOW,  LOW,  LOW }, // 1
-  {HIGH, HIGH, LOW,  HIGH, HIGH, LOW,  HIGH}, // 2
-  {HIGH, HIGH, HIGH, HIGH, LOW,  LOW,  HIGH}, // 3
-  {LOW , HIGH, HIGH, LOW , LOW,  HIGH, HIGH}, // 4
-  {HIGH, LOW,  HIGH, HIGH, LOW,  HIGH, HIGH}, // 5
-  {HIGH, LOW,  HIGH, HIGH, HIGH, HIGH, HIGH}, // 6
-  {HIGH, HIGH, HIGH, LOW,  LOW,  LOW,  LOW }, // 7
-  {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH}, // 8
-  {HIGH, HIGH, HIGH, HIGH, LOW,  HIGH, HIGH}, // 9
+    void update() {
+      if (coord->isRunning()) {
+        start();
+      }
+      else {
+        stop();
+      }
+    }
+
+    void start()
+    {
+      if (!isRunning) {
+        tone(SPEAKER_OUT, FREQUENCY_HZ);
+        isRunning = true;
+      }
+    }
+
+    void stop() {
+      if (isRunning) {
+        noTone(SPEAKER_OUT);
+        isRunning = false;
+      }
+    }
+
 };
 
-const int DISPLAY_DELAY = 500;
-const int DISPLAY_COUNT = 3;
-const int SEVEN_SEG_CATHODES[] = {11, 12, 13};
-
-const int SPEAKER_OUT = 9;
-
+PumpCoordinator coordinator;
+SevenSegmentArrayDisplay disp(&coordinator);
+Speaker speaker(&coordinator);
+ActivatorButton button(&coordinator, 2);
+boolean donePumping = false;
 
 void setup() {
-  for (int i = 0; i < 7; i++) {
-    pinMode(SEVEN_SEG_PINS[i], OUTPUT);
-    digitalWrite(SEVEN_SEG_PINS[i], LOW);
-  }
-  for (int i = 0; i < DISPLAY_COUNT; i++) {
-    pinMode(SEVEN_SEG_CATHODES[i], OUTPUT);
-    digitalWrite(SEVEN_SEG_CATHODES[i], LOW);
-  }
-
-  pinMode(SPEAKER_OUT, OUTPUT);
+  randomSeed(analogRead(0));
+  disp.setup();
+  speaker.setup();
+  button.setup();
 }
 
 void loop() {
-  
-  long counter = min(999, millis()/100);
-  int hundreds = counter / 100;
-  int tens = (counter / 10) % 10;
-  int ones = counter % 10;
-  
-    
-  outputNumber(1, ones);
-  //playTone(DISPLAY_DELAY);
-  if(hundreds > 0 || tens > 0) {
-    outputNumber(2, tens);  
-  }
-  //playTone(DISPLAY_DELAY);
-  if(hundreds > 0) {
-    outputNumber(3, hundreds);  
-  }
-  //playTone(DISPLAY_DELAY);
-}
 
-void playTone(int duration) {
-  int endtime = millis() + duration;
-  while(millis() < endtime) {
-    digitalWrite(SPEAKER_OUT,HIGH);
-    delay(10);
-    digitalWrite(SPEAKER_OUT,LOW);
-    delay(10);
+  if (coordinator.isActivated()) {
+    disp.update();
+    speaker.update();
+
+    if (millis() > 60000) { // shutdown 1 minute after system starts
+      shutdown();
+    }
   }
 }
 
-/// number - number (0-9) to show on display
-/// displayIndex - index (1-DISPLAY_COUNT) of 7-segment display to use
-void outputNumber(int displayIndex, int number) {
-  //disable all cathodes
-  for (int i = 0; i < DISPLAY_COUNT; i++) {
-    digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
-  }
-
-  //set states of each segment pin
-  for (int i = 0; i < 7; i++) {
-    digitalWrite(SEVEN_SEG_PINS[i], SEVEN_SEG_PIN_STATES[number][i]);
-  }
-
-  //enable correct cathode
-  digitalWrite(SEVEN_SEG_CATHODES[displayIndex-1], LOW);
+//emulate shutdown by going into an eternal extreme power saving mode
+void shutdown() {
+  speaker.stop();
+  disp.stop();
+  cli(); // disable global interrupts
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+  sleep_bod_disable();
+  sleep_mode();
 }
-
 

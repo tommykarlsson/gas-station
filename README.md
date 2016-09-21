@@ -1,7 +1,13 @@
 # gas-station
 
-Upload to standalone atmega328p using Arduino IDE:
+## Software
 
-Tools -> Board = "Arduino/Genuino Uno"
-Tools -> Programmer = "Arduino as ISP"
-Sketch -> Upload
+Upload to standalone ATMega328p using Arduino IDE:
+
+1. Tools -> Board = "Arduino/Genuino Uno"
+2. Tools -> Programmer = "Arduino as ISP"
+3. Sketch -> Upload
+
+## Hardware
+
+![Breadbord wiring](doc/gas-station_bb.png)

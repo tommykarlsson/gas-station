@@ -1,8 +1,12 @@
+#include "PumpCoordinator.h"
+
 class SevenSegmentArrayDisplay {
 
   public:
-    void setup(int maxVal);
-    void update(unsigned long startTime);
+    SevenSegmentArrayDisplay(PumpCoordinator *coordinator);
+    void setup();
+    void update();
+    void stop();
   private:
     //pins for segments on the 7 segment displays
 
@@ -34,11 +38,10 @@ class SevenSegmentArrayDisplay {
     const int DISPLAY_COUNT = 3;
     const int SEVEN_SEG_CATHODES[3] = {4, 12, 13};
 
-    const unsigned long updateInterval = 1;
-    unsigned long lastUpdate;         // last time of update
+    const long updateInterval = 3;
+    long lastUpdate;         // last time of update
 
-    int lastDigit = 0;
     int lastDisplayIndex = 0;         // current enabled display
 
-    int maxValue = 0;
+    PumpCoordinator *coord;
 };
