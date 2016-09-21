@@ -70,3 +70,12 @@ void SevenSegmentArrayDisplay::update()
   }
 }
 
+void SevenSegmentArrayDisplay::stop()
+{
+  //disable all cathodes
+  for (int i = 0; i < DISPLAY_COUNT; i++) {
+    pinMode(SEVEN_SEG_CATHODES[i], OUTPUT);
+    digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
+  }
+}
+

@@ -61,19 +61,19 @@ void setup() {
 void loop() {
 
   if (coordinator.isActivated()) {
-    //delay(1);
     disp.update();
     speaker.update();
 
-
-    //if(millis() > button.getPumpStartTime() + 300000) { // shutdown 5 minutes after pump starts
-    // shutdown();
-    //}
+    if (millis() > 60000) { // shutdown 1 minute after system starts
+      shutdown();
+    }
   }
 }
 
 //emulate shutdown by going into an eternal extreme power saving mode
 void shutdown() {
+  speaker.stop();
+  disp.stop();
   cli(); // disable global interrupts
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();

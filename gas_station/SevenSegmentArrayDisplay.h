@@ -6,6 +6,7 @@ class SevenSegmentArrayDisplay {
     SevenSegmentArrayDisplay(PumpCoordinator *coordinator);
     void setup();
     void update();
+    void stop();
   private:
     //pins for segments on the 7 segment displays
 
