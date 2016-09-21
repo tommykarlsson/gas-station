@@ -1,8 +1,11 @@
+#include "PumpCoordinator.h"
+
 class ActivatorButton {
 
   public:
-    explicit ActivatorButton(int pin);
+    ActivatorButton(PumpCoordinator *coordinator, int pin);
     void setup();
-    bool isActivated();
-    unsigned long getActivationTime();
+    boolean isActivated();
+    long getActivationTime();
+    long getPumpStartTime();
 };

@@ -1,16 +1,12 @@
 #include <Arduino.h>
 #include "SevenSegmentArrayDisplay.h"
 
-SevenSegmentArrayDisplay::SevenSegmentArrayDisplay() {
-  lastUpdate = 0UL;
-  maxValue = 0UL;
-  lastDisplayIndex = 0;
+SevenSegmentArrayDisplay::SevenSegmentArrayDisplay(PumpCoordinator *coordinator) {
+  coord = coordinator;
 }
 
-void SevenSegmentArrayDisplay::setup(int maxVal)
+void SevenSegmentArrayDisplay::setup()
 {
-  maxValue = maxVal;
-
   for (int i = 0; i < 7; i++) {
     pinMode(SEVEN_SEG_PINS[i], OUTPUT);
     digitalWrite(SEVEN_SEG_PINS[i], LOW);
@@ -19,36 +15,13 @@ void SevenSegmentArrayDisplay::setup(int maxVal)
     pinMode(SEVEN_SEG_CATHODES[i], OUTPUT);
     digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
   }
+  lastUpdate = millis();
 }
 
-//void SevenSegmentArrayDisplay::shutdown() {
-//  for (int i = 0; i < DISPLAY_COUNT; i++) {
-//    digitalWrite(SEVEN_SEG_CATHODES[i], HIGH);
-//  }
-//}
-
-int SevenSegmentArrayDisplay::calcCounter(unsigned long startTime, unsigned long currentMillis, unsigned long endTime) {
-  int counter = 0;
-  if (currentMillis > startTime) {
-    counter = (currentMillis - startTime) / MILLIS_PER_INCREMENT;
-  }
-  return constrain(counter, 0, maxValue);
-
-  //  unsigned long counter = 0UL;
-  //  if (currentMillis > endTime) {
-  //    counter = maxValue;
-  //  } else if (currentMillis > startTime) {
-  //    counter = (currentMillis - startTime) / MILLIS_PER_INCREMENT;
-  //  }
-  //  return counter;
-}
-
-bool SevenSegmentArrayDisplay::update(unsigned long startTime)
+void SevenSegmentArrayDisplay::update()
 {
-  unsigned long currentMillis = millis();
-  unsigned long endTime = startTime + (maxValue * (long)MILLIS_PER_INCREMENT);
-
-  if ((currentMillis - lastUpdate) > UPDATE_INTERVAL) // time to update
+  long currentMillis = millis();
+  if ((currentMillis - lastUpdate) > updateInterval) // time to update
   {
     lastUpdate = currentMillis;
 
@@ -57,12 +30,11 @@ bool SevenSegmentArrayDisplay::update(unsigned long startTime)
       displayIndex = 2;
     }
 
-    //calculate counter
-    int counter = calcCounter(startTime, currentMillis, endTime);
+    //calc number to print
+    boolean doPrint = true;
+    int digit = 0;
+    int counter = coord->getPumpedVolume();
 
-    //calculate digit to print
-    bool doPrint = true;
-    int digit;
     if (displayIndex == 0) {
       digit = counter % 10;
     }
@@ -77,7 +49,7 @@ bool SevenSegmentArrayDisplay::update(unsigned long startTime)
       if (counter < 100) {
         doPrint = false;
       } else {
-        digit = counter / 100;
+        digit =  counter / 100;
       }
     }
 
@@ -96,6 +68,5 @@ bool SevenSegmentArrayDisplay::update(unsigned long startTime)
       digitalWrite(SEVEN_SEG_CATHODES[displayIndex], LOW);
     }
   }
-  return (currentMillis >= startTime) && (currentMillis <= endTime);
 }
 
